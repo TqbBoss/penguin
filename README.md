@@ -1,5 +1,5 @@
 # penguin
-tp6、uni-app构建的线上小型购物app前后端
+tp6、uni-app、mysql、vue构建的线上小型购物app前后端
 
 ## 项目结构
 名称 | 描述 | 环境要求 | 备注

@@ -21,10 +21,13 @@
     ],
     "require": {
         "php": ">=7.1.0",
+        "ext-json": "*",
         "topthink/framework": "^6.0.0",
         "topthink/think-orm": "^2.0",
         "topthink/think-helper": "^3.1",
-        "topthink/think-multi-app": "^1.0"
+        "topthink/think-multi-app": "^1.0",
+        "guzzlehttp/guzzle": "^6.5",
+        "firebase/php-jwt": "^5.2"
     },
     "require-dev": {
         "symfony/var-dumper": "^4.2",

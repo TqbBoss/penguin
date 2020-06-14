@@ -1,3 +1,3 @@
 <?php
 use think\facade\Route;
-Route::post('login', 'AuthController/login');
+Route::get('login', 'AuthController/login');

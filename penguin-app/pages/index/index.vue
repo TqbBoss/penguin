@@ -16,25 +16,25 @@
 				<view class="tui-card go-goods-card">
 					<view class="tui-card-header" :tui-header-line="false">
 						<view class="tui-header-left">
-							<text class="go-card-p">推荐分类</text>
+							<text class="go-card-p">{{goods.title}}</text>
 						</view>
 					</view>
 					<view class="tui-card-body go-card-p">
 						<view class="flex flex-wrap">
-							<view class="go-good flex" v-for="menu in menus" :key="menu.id">
+							<view class="go-good flex" v-for="good in goods.data" :key="good.id">
 								<view class="go-good-header">
-									<image :src="menu.image" mode="scaleToFill"></image>
+									<image :src="good.thumbnail" mode="scaleToFill"></image>
 								</view>
 								<view class="go-good-body flex flex-direction justify-between">
-									<view class="good-title">{{menu.title}}</view>
+									<view class="good-title">{{good.name}}</view>
 									<view class="flex flex-direction goods-des">
 										<view class="flex goods-h">
-											<view class="nprice">￥{{menu.price}}</view>
-											<view class="oprice">￥{{menu.old_price}}</view>
+											<view class="nprice">￥{{good.concessional_price}}</view>
+											<view class="oprice">￥{{good.original_price}}</view>
 										</view>
 										<view class="flex goods-h goods-border-bottom justify-between">
-											<view class="sales">月销售量{{menu.month_sales}}件</view>
-											<view :id="menu.id" class="goods-btn" @click="addToCart(menu)">
+											<view class="sales">总销售量{{good.sold}}件</view>
+											<view :id="good.dom_id" class="goods-btn" @click="addToCart(good)">
 												<text>+</text>
 											</view>
 										</view>
@@ -53,6 +53,8 @@
 </template>
 
 <script>
+	import http from '../../common/http.js';
+	
 	export default {
 		data() {
 			return {
@@ -68,84 +70,45 @@
 					image: '../../static/images/goods/1.jpg',
 					show: false
 				},
-				menus: [{
-					id: "id_1",
-					title: "厄瓜多尔虾",
-					price: 59.9,
-					old_price: 119.8,
-					month_sales: 223,
-					image: '../../static/images/goods/1.jpg'
-				},{
-					id: "id_2",
-					title: "马面鱼",
-					price: 59.9,
-					old_price: 119.8,
-					month_sales: 223,
-					image: '../../static/images/goods/2.jpg'
-				},{
-					id: "id_3",
-					title: "大海螺",
-					price: 59.9,
-					old_price: 119.8,
-					month_sales: 223,
-					image: '../../static/images/goods/3.jpg'
-				},{
-					id: "id_4",
-					title: "红斑鱼",
-					price: 59.9,
-					old_price: 119.8,
-					month_sales: 223,
-					image: '../../static/images/goods/4.jpg'
-				}],
-				tabItems: [{
-					name: '推荐分类',
-					active: false
-				},{
-					name: '进口超市',
-					active: true
-				},{
-					name: '国际名牌',
-					active: false
-				},{
-					name: '奢侈品',
-					active: false
-				},{
-					name: '男装',
-					active: false
-				},{
-					name: '女装',
-					active: false
-				},{
-					name: '童装',
-					active: false
-				},{
-					name: '轻奢',
-					active: false
-				},{
-					name: '手机数码',
-					active: false
-				},{
-					name: '电脑办公',
-					active: false
-				},{
-					name: '游戏',
-					active: false
-				},{
-					name: '生鲜',
-					active: false
-				},{
-					name: '水果',
-					active: false
-				}]
+				goods: {
+					title: '',
+					data: []
+				},
+				tabItems: []
 			}
 		},
-		onShow() {
-			if(this.cart_shoppings > 0){
-				uni.setTabBarBadge({
-					index: 1,
-					text: this.cart_shoppings + ''
-				});
-			}
+		onLoad() {
+			let $that = this;
+			http.get('/api/goods/all').then((res)=>{
+				if(res.code == 200){
+					let result = res.data;
+					let active = true;
+					this.tabItems = [];
+					for(let m in result) {
+						let transAttData = result[m].map((it)=>{
+							it.dom_id = 'id_' + it.id;
+							it.thumbnail = this.BASE_URL +it.thumbnail;
+							return it;
+						})
+					    this.tabItems.push({
+							name: m,
+							active: active,
+							data: transAttData
+						});
+						if(active){
+							this.goods.data = [];
+							this.goods.title = m;
+							transAttData.forEach((good)=>{
+								this.goods.data.push(good);
+							});
+						}
+						active = false;
+					}; 
+				}
+			});
+			uni.$on('loginOn',function(){
+			    $that.getCartCount();
+			})
 		},
 		onPullDownRefresh(){
 			setTimeout(function(){
@@ -163,21 +126,40 @@
 				this.tabItems[this.currentTabIndex].active = false;
 				this.currentTabIndex = index;
 				this.tabItems[index].active = true;
+				
+				this.goods.data = [];
+				this.goods.title = this.tabItems[index].name;
+				this.tabItems[index].data.forEach((good)=>{
+					this.goods.data.push(good);
+				})
 			},
-			addToCart(menu) {
+			addToCart(menu){
+				http.post(`/api/goods/cart/add/${menu.id}/1?XDEBUG_SESSION_START=13575`).then((item)=>{
+					if(item.data.code == 200){
+						this.animateAddToCart(menu);
+					}
+					else{
+						uni.showToast({
+						    title: '添加失败',
+						    duration: 2000
+						});
+					}
+				});
+			},
+			animateAddToCart(menu) {
 				if(this.isAnimate){
 					return;
 				}
 				let $that = this;
 				$that.isAnimate = true;
-				$that.ball.image = menu.image;
+				$that.ball.image = menu.thumbnail;
 				let animation = uni.createAnimation({
 					duration:150,
 					timeFunction: 'ease',
 					delay: 0,
 					transformOrigin: '50% 50%'
 				});
-				let point = uni.createSelectorQuery().select('#' + menu.id);
+				let point = uni.createSelectorQuery().select('#' + menu.dom_id);
 				point.boundingClientRect(data1 => {
 					$that.ball.left = data1.left;
 					$that.ball.top = data1.top;
@@ -201,6 +183,20 @@
 						},300);
 					}).exec();
 				}).exec();
+			},
+			getCartCount() {
+				let $that = this;
+				http.get('/api/goods/cart/count').then((item)=>{
+					if(item.code == 200){
+						$that.cart_shoppings = item.count;
+						if($that.cart_shoppings > 0){
+							uni.setTabBarBadge({
+								index: 1,
+								text: $that.cart_shoppings + ''
+							});
+						}
+					}
+				});
 			}
 		}
 	}

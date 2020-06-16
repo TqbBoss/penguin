@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\api\exception;
+namespace app\api\http\exception;
 
 
 use Throwable;

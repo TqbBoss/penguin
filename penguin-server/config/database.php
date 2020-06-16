@@ -23,11 +23,11 @@ return [
             // 服务器地址
             'hostname'          => env('database.hostname', '127.0.0.1'),
             // 数据库名
-            'database'          => env('database.database', 'shopstore'),
+            'database'          => env('database.database', 'penguin'),
             // 用户名
-            'username'          => env('database.username', 'php_penguin'),
+            'username'          => env('database.username', 'penguin'),
             // 密码
-            'password'          => env('database.password', 'php_penguin'),
+            'password'          => env('database.password', 'Penguin2020;'),
             // 端口
             'hostport'          => env('database.hostport', '3306'),
             // 数据库连接参数

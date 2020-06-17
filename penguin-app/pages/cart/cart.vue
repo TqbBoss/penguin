@@ -1,6 +1,6 @@
 <template>
 	<view class="cart-container flex flex-direction">
-		<cu-custom bgColor="cart-nav" :isBack="false">
+		<cu-custom bgColor="bg-header" :isBack="false">
 			<block slot="content">购物车</block>
 		</cu-custom>
 		<view class="cart-body flex flex-direction">
@@ -98,7 +98,9 @@
 				}
 			},
 			summitOrder(){
-				
+				uni.navigateTo({
+					url:'/pages/order/order'
+				})
 			}
 		}
 	}
@@ -112,10 +114,6 @@
 		width: 100%;
 		height: 100vh;
 		
-		.cart-nav {
-			background-image: linear-gradient(270deg, #ff9700, #ed1c24);
-			color: #ffffff;
-		}
 		.cart-body {
 			flex: 1;
 			

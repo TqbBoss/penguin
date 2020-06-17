@@ -69,7 +69,7 @@ export default {
 			    success: function (res) {
 					http.refreshToken()
 					.then((res)=>{
-						this.initData();
+						$that.initData();
 					})
 					.catch((errMsg)=>{
 						uni.showModal({
@@ -101,6 +101,7 @@ export default {
 <style>
 	@import "./lib/colorui/main.css";
 	@import "./lib/colorui/icon.css"; 
+	@import "./styles/app.css";
 	
 	/* 解决头条小程序组件内引入字体不生效的问题 */
 	/* #ifdef MP-TOUTIAO */

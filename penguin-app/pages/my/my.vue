@@ -1,6 +1,6 @@
 <template>
 	<view>
-		<cu-custom bgColor="my-nav" :isBack="false">
+		<cu-custom bgColor="bg-header" :isBack="false">
 			<block slot="content">个人中心</block>
 		</cu-custom>
 		<view class="my-header my-nav">
@@ -96,10 +96,6 @@
 		justify-content: space-between;
 		align-items: center;
 		padding: 24upx 48upx 24upx 48upx;
-	}
-	.my-nav {
-		background-image: linear-gradient(270deg, #ff9700, #ed1c24);
-		color: #ffffff;
 	}
 	.my-nologin{
 		font-size: 32upx;

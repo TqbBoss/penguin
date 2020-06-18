@@ -1,30 +1,33 @@
 <template>
-  <div id="app">
-    <u-action-sheet :list="list" v-model="show"></u-action-sheet>
-  </div>
+	<div id="app">
+		<Button>Default</Button>
+		<Button type="primary">Primary</Button>
+		<Button type="dashed">Dashed</Button>
+		<Button type="text">Text</Button>
+		<br><br>
+		<Button type="info">Info</Button>
+		<Button type="success">Success</Button>
+		<Button type="warning">Warning</Button>
+		<Button type="error">Error</Button>
+		<br><br>
+		<i-switch v-model="switch1" />
+		<i-circle :percent="80">
+			<span class="demo-Circle-inner" style="font-size:24px">80%</span>
+		</i-circle>
+	</div>
 </template>
 
 <script>
-import uActionSheet from "uview-ui/components/u-action-sheet/u-action-sheet.vue";
-	
 export default {
 	name: 'App',
 	data() {
 		return {
-			list: [{
-				text: '点赞',
-				color: 'blue',
-				fontSize: 28
-			}, {
-				text: '分享'
-			}, {
-				text: '评论'
-			}],
-			show: true
+			switch1: true,
+			time1: (new Date()).getTime() - 60 * 3 * 1000,
+			time2: (new Date()).getTime() - 86400 * 3 * 1000
 		}
 	},
 	components: {
-		uActionSheet
 	}
 }
 </script>

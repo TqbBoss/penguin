@@ -38,7 +38,7 @@ module.exports = {
           "window.echarts": "echarts"
         }),
         new WebpackBar({
-          name: `来源: tqboss`,
+          name: `(TqbBoss)penguin-admin项目编译 =>`,
         })
 	];
 	if(process.env.NODE_ANALYZER === 'builder'){
@@ -49,6 +49,7 @@ module.exports = {
         alias: {
           "@": resolve("src"),
           "^": resolve("src/components"),
+		  "*": resolve("node_modules")
         },
       },
       plugins: plugins
@@ -74,13 +75,18 @@ module.exports = {
         chunks: "all",
         cacheGroups: {
           libs: {
-            name: "chunk-libs",
+            name: "lib-modules",
             test: /[\\/]node_modules[\\/]/,
             priority: 10,
             chunks: "initial",
           },
+		  elementUI: {
+		    name: "lib-iview",
+		    priority: 20,
+		    test: /[\\/]node_modules[\\/]_?view-design(.*)/,
+		  },
           commons: {
-            name: "chunk-commons",
+            name: "lib-penguin",
             test: resolve("src/components"),
             minChunks: 3,
             priority: 5,

@@ -15,6 +15,11 @@
 		"style": {
 			"navigationBarTitleText": "个人中心"
 		}
+	},{
+		"path": "pages/order/order",
+		"style": {
+			"navigationBarTitleText": "填写订单"
+		}
 	}],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
@@ -52,7 +57,8 @@
 	"easycom": {
 		"autoscan": true,
 		"custom": {
-			"tui-(.*)": "@/lib/thorui/tui-$1/tui-$1.vue"
+			"tui-(.*)": "@/lib/thorui/tui-$1/tui-$1.vue",
+			 "FontAwesome": "@/components/Ammmm-FontAwesome/index.vue" // 加入此行即可
 		}
 	},
 	"condition" : { //模式配置，仅开发期间生效

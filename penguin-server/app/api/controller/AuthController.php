@@ -3,50 +3,36 @@
 
 namespace app\api\controller;
 
-use GuzzleHttp\Client;
-use GuzzleHttp\Exception\RequestException;
-use think\facade\Config;
+use app\api\security\ErrorCode;
+use app\BaseController;
 
 /**
  * Class AuthController
  * @package app\api\controller
  * Token认证
  */
-class AuthController
+class AuthController extends BaseController
 {
     /**
      * @param string $code
-     * @return \Psr\Http\Message\StreamInterface|string
-     * @throws \GuzzleHttp\Exception\GuzzleException
+     * @param string $iv
+     * @param string $encryptedData
+     * @return \think\response\Json
      * 微信后台登入认证
      */
-    public function login(string $code){
-        $appId = Config::get('weixin.AppId');
-        $appSecret = Config::get('weixin.AppSecret');
-        $baseUrl = Config::get('weixin.baseUrl');
-
-        $client = new Client([
-            'base_uri' => $baseUrl,
-            'timeout'  => 5.0
+    public function login(string $code, string $iv, string $encryptedData){
+        $user = app('api_auth')->getAuthUser($code, $iv, $encryptedData);
+        $token = jwtEncode([
+           'uid'    =>  $user['uid']
         ]);
+        return json([
+            'token'     =>  $token,
+            'code'      =>  ErrorCode::$OK,
+            'message'   => ''
+        ]);
+    }
 
-        try {
-            $response = $client->request('GET', 'sns/jscode2session', [
-                'query' => [
-                    'appid'         => $appId,
-                    'secret'        => $appSecret,
-                    'js_code'       => $code,
-                    'grant_type'    => 'authorization_code'
-                ]
-            ]);
+    public function decrypt(){
 
-        }
-        catch (RequestException $e){
-            return 'error';
-        }
-
-        $jsonData = json_decode($response->getBody());
-
-        return $jsonData;
     }
 }

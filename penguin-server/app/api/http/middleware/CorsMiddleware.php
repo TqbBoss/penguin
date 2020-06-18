@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\api\middleware;
+namespace app\api\http\middleware;
 
 
 use app\Request;
@@ -18,8 +18,7 @@ class CorsMiddleware
      */
     public function handle(Request $request, Closure $next)
     {
-        $header = Config::get('penguin.cors');
-        $origin = $request->header('origin');
+        $header = Config::get('penguin.cors', []);
 
         if ($request->method(true) == 'OPTIONS') {
             $response = Response::create()->code(204)->header($header);

@@ -67,7 +67,7 @@
 				ball: {
 					left: 0,
 					top: 0,
-					image: '../../static/images/goods/1.jpg',
+					image: '',
 					show: false
 				},
 				goods: {
@@ -108,7 +108,7 @@
 			});
 			uni.$on('loginOn',function(){
 			    $that.getCartCount();
-			})
+			});
 		},
 		onPullDownRefresh(){
 			setTimeout(function(){
@@ -134,17 +134,25 @@
 				})
 			},
 			addToCart(menu){
-				http.post(`/api/goods/cart/add/${menu.id}/1?XDEBUG_SESSION_START=13575`).then((item)=>{
-					if(item.data.code == 200){
+				let exist = false;
+				let carts = getApp().globalData.carts;
+				carts.forEach((cart)=>{
+					if(cart.id === menu.id){
+						exist = true;
+						cart.good_num += 1;
+						getApp().globalData.count += 1;
+						this.cart_shoppings = getApp().globalData.count;
 						this.animateAddToCart(menu);
 					}
-					else{
-						uni.showToast({
-						    title: '添加失败',
-						    duration: 2000
-						});
-					}
 				});
+				if(!exist){
+					menu.good_num = 1;
+					menu.is_selected = 1;
+					carts.push(menu);
+					getApp().globalData.count += 1;
+					this.cart_shoppings = getApp().globalData.count;
+					this.animateAddToCart(menu);
+				}
 			},
 			animateAddToCart(menu) {
 				if(this.isAnimate){
@@ -175,7 +183,6 @@
 							$that.ball.show = false;
 							$that.animationData = {};
 							$that.isAnimate = false;
-							$that.cart_shoppings += 1;
 							uni.setTabBarBadge({
 								index: 1,
 								text: $that.cart_shoppings + ''
@@ -186,17 +193,13 @@
 			},
 			getCartCount() {
 				let $that = this;
-				http.get('/api/goods/cart/count').then((item)=>{
-					if(item.code == 200){
-						$that.cart_shoppings = item.count;
-						if($that.cart_shoppings > 0){
-							uni.setTabBarBadge({
-								index: 1,
-								text: $that.cart_shoppings + ''
-							});
-						}
-					}
-				});
+				$that.cart_shoppings = getApp().globalData.count;
+				if($that.cart_shoppings > 0){
+					uni.setTabBarBadge({
+						index: 1,
+						text: $that.cart_shoppings + ''
+					});
+				}
 			}
 		}
 	}

@@ -1,24 +1,24 @@
 <template>
 	<view class="cart-container flex flex-direction">
-		<cu-custom bgColor="cart-nav" :isBack="false">
+		<cu-custom bgColor="bg-header" :isBack="false">
 			<block slot="content">购物车</block>
 		</cu-custom>
 		<view class="cart-body flex flex-direction">
 			<scroll-view class="cart-items" :scroll-top="scrollTop" :scroll-y="true">
 				<view class="cart-item flex justify-between align-center" v-for="(item,index) in shoppings" :key="item.id">
 					<view class="item-left flex justify-between align-center">
-						<evan-checkbox v-model="item.checked" primary-color="#F1AD01"></evan-checkbox>
+						<evan-checkbox v-model="item.is_selected" primary-color="#F1AD01"></evan-checkbox>
 						<view class="item-picture">
-							<image src="../../static/images/goods/1.jpg" mode="scaleToFill"></image>
+							<image :src="item.thumbnail" mode="scaleToFill"></image>
 						</view>
 					</view>
 					<view class="cart-right flex flex-direction justify-between">
-						<view class="right-title">{{item.text}}</view>
+						<view class="right-title">{{item.name}}</view>
 						<view class="flex justify-between align-center">
-							<view>￥<text class="item-price">{{item.price}}</text></view>
+							<view>￥<text class="item-price">{{item.concessional_price}}</text></view>
 							<view class="flex">
 								<view class="cart-op op-del" @click="del(item)">一</view>
-								<view class="cart-op">{{item.count}}</view>
+								<view class="cart-op">{{item.good_num}}</view>
 								<view class="cart-op op-add" @click="add(item)">十</view>
 							</view>
 						</view>
@@ -37,20 +37,24 @@
 </template>
 
 <script>
+	import http from '../../common/http.js';
+	
 	export default {
 		data(){
 			return {
-				shoppings: [{
-					id: "1",
-					text: "【大青虾2斤】",
-					price: 79,
-					count: 1,
-					checked: true
-				}]
+				shoppings: []
 			}
 		},
-		onLoad() {
-			
+		onShow() {
+			let $that = this;
+			$that.shoppings = [];
+			let data = getApp().globalData.carts;
+			data.forEach((item)=>{
+				if(!item.thumbnail.startsWith('http')){
+					item.thumbnail = this.BASE_URL +item.thumbnail;
+				}
+				$that.shoppings.push(item);
+			});
 		},
 		computed:{
 			canUse(){
@@ -59,24 +63,24 @@
 			totalCount(){
 				let count = 0;
 				this.shoppings.forEach((it)=>{
-					count += it.count;
+					count += it.good_num;
 				})
 				return count;
 			},
 			totalPrice(){
 				let price = 0.0;
 				this.shoppings.forEach((it)=>{
-					price += it.price * it.count;
+					price += it.concessional_price * it.good_num;
 				})
 				return Math.round(price);
 			}
 		},
 		methods:{
 			add(data){
-				data.count += 1;
+				data.good_num += 1;
 			},
 			del(data){
-				if(data.count === 1){
+				if(data.good_num === 1){
 					let $that = this;
 					uni.showModal({
 						content:"是否删除选购商品?",
@@ -94,7 +98,9 @@
 				}
 			},
 			summitOrder(){
-				
+				uni.navigateTo({
+					url:'/pages/order/order'
+				})
 			}
 		}
 	}
@@ -108,10 +114,6 @@
 		width: 100%;
 		height: 100vh;
 		
-		.cart-nav {
-			background-image: linear-gradient(270deg, #ff9700, #ed1c24);
-			color: #ffffff;
-		}
 		.cart-body {
 			flex: 1;
 			

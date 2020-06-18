@@ -1,7 +1,7 @@
 <?php
 
 
-namespace app\api;
+namespace app\api\http;
 
 /**
  * Class HttpCode

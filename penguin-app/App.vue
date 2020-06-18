@@ -4,6 +4,10 @@ import config from 'common/config.js';
 import http from './common/http.js';
 
 export default {
+	globalData:{
+		carts: [],
+		count: 0
+	},
 	onLaunch: function() {
 		uni.getSystemInfo({
 			success: function(e) {
@@ -37,12 +41,24 @@ export default {
 				$that.getAuthUser();
 			}
 			else{
-				uni.$emit('loginOn');
+				this.initData();
 			}
 		});
+		uni.$on('token_expire',function(){
+		    $that.getAuthUser();
+		})
 	},
 	onHide: function() {
-		console.log('App Hide');
+		let data = getApp().globalData.carts.map((item)=>{
+			return {
+				id: item.id,
+				count: item.good_num,
+				selected: item.is_selected
+			}
+		});
+		http.post('/api/goods/cart/add?XDEBUG_SESSION_START=14330', data).then((res)=>{
+			console.log(res);
+		});
 	},
 	methods: {
 		getAuthUser (){
@@ -51,53 +67,31 @@ export default {
 			    content: '请先登入',
 				showCancel: false,
 			    success: function (res) {
-			        http.login()
-			        .then((res)=>{
-						http.post('/api/login?XDEBUG_SESSION_START=13575', {
-							"code": res.code,
-							"encryptedData": res.encryptedData,
-							"iv": res.iv
-						}, 'application/json')
-						.then((response)=>{
-							if(response.data.code == 200){
-								uni.setStorageSync("penguin_token", response.data.token);
-								uni.setStorage({
-									key: "wx_userinfo",
-									data: res.rawData
-								});
-								uni.$emit('loginOn');
-							}
-							else{
-								uni.showModal({
-								    content: response.message,
-									showCancel: false,
-								    success: function (e) {
-								        $that.getAuthUser();
-								    }
-								});
-							}
-						})
-						.catch((e)=>{
-							console.error(e);
-							uni.showModal({
-							    content: e.message,
-								showCancel: false,
-							    success: function (e) {
-							        $that.getAuthUser();
-							    }
-							});
+					http.refreshToken()
+					.then((res)=>{
+						$that.initData();
+					})
+					.catch((errMsg)=>{
+						uni.showModal({
+						    content: errMsg,
+							showCancel: false,
+						    success: function (e) {
+						        $that.getAuthUser();
+						    }
 						});
-			        })
-			        .catch((e)=>{
-			        	uni.showModal({
-			        	    content: '登入失败',
-			        		showCancel: false,
-			        	    success: function (e) {
-			        	        $that.getAuthUser();
-			        	    }
-			        	});
-			        });
+					});
 			    }
+			});
+		},
+		initData(){
+			let data = getApp().globalData.carts;
+			http.get('/api/goods/cart/all')
+			.then((res)=>{
+				res.forEach((item)=>{
+					this.$scope.globalData.count += item.good_num;
+					data.push(item);
+				})
+				uni.$emit('loginOn');
 			});
 		}
 	}
@@ -107,6 +101,7 @@ export default {
 <style>
 	@import "./lib/colorui/main.css";
 	@import "./lib/colorui/icon.css"; 
+	@import "./styles/app.css";
 	
 	/* 解决头条小程序组件内引入字体不生效的问题 */
 	/* #ifdef MP-TOUTIAO */

@@ -1,12 +1,14 @@
 <?php
 namespace app;
 
+use app\api\http\exception\AuthException;
 use think\db\exception\DataNotFoundException;
 use think\db\exception\ModelNotFoundException;
 use think\exception\Handle;
 use think\exception\HttpException;
 use think\exception\HttpResponseException;
 use think\exception\ValidateException;
+use think\facade\Log;
 use think\Response;
 use Throwable;
 
@@ -50,8 +52,27 @@ class ExceptionHandle extends Handle
      */
     public function render($request, Throwable $e): Response
     {
-        // 添加自定义异常处理机制
+        // 登入认证异常处理
+        if ($e instanceof AuthException) {
+            return json([
+                'code'      => $e->getCode(),
+                'message'   => $e->getMessage()
+            ]);
+        }
 
+        if ($e instanceof \Exception) {
+            return json([
+                'code'      => $e->getCode(),
+                'message'   => $e->getMessage()
+            ]);
+        }
+        if ($e instanceof \Error){
+            Log::error($e->getMessage());
+            return json([
+                'code'      => $e->getCode(),
+                'message'   => '系统错误，请查看系统日志'
+            ]);
+        }
         // 其他错误交给系统处理
         return parent::render($request, $e);
     }

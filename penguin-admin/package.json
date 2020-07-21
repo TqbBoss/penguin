@@ -13,7 +13,7 @@
     "better-scroll": "^1.15.2",
     "core-js": "^3.6.5",
     "echarts": "^4.8.0",
-    "lodash": "^4.17.15",
+    "lodash": "^4.17.19",
     "view-design": "^4.2.0",
     "vue": "^2.6.11",
     "vue-qart": "^2.2.0",
